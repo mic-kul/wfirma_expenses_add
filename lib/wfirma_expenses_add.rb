@@ -1,6 +1,5 @@
 require 'capybara'
 require 'capybara/poltergeist'
-require 'capybara-screenshot'
 
 module Wfirma
   module Expenses
