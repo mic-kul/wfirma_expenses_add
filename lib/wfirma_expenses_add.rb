@@ -6,16 +6,25 @@ module Wfirma
     class Add
       include Capybara::DSL
       Capybara.default_driver = :poltergeist
+      attr_accessor :user_login, :password, :nip, :document_number, :amount_brutto,
+                    :purchase_date, :expense_type, :date, :pay_until, :paid
+      EXPENSES =
+      {
+        other: 'Inne wydatki',
+        tele_media: 'Koszty mediów',
+      }
 
-      attr_accessor :user_login, :password, :nip, :document_number, :amount_brutto, :purchase_date
-
-      def initialize(user_login, password, nip, document_number, amount_brutto, purchase_date)
-        @user_login = user_login
-        @password = password
-        @nip = nip
-        @document_number = document_number
-        @amount_brutto = amount_brutto
-        @purchase_date = purchase_date
+      def initialize(options)
+        @user_login = options[:wfirma_login]
+        @password = options[:wfirma_password]
+        @nip = options[:nip]
+        @document_number = options[:document_number]
+        @amount_brutto = options[:amount_brutto]
+        @date = options[:date]
+        @purchase_date = options[:date_purchase]
+        @expense_type = options[:expense_type]
+        @pay_until = options[:pay_until]
+        @paid = options[:paid]
       end
 
       def run!
@@ -52,8 +61,10 @@ module Wfirma
       end
 
       def fill_dates
-        page.execute_script %{ $('.datepicker').val('#{purchase_date}')}
-        page.execute_script %{ $('.checkbox2').click() }
+        page.execute_script %{ $('#ExpenseDate').val('#{date}')}
+        page.execute_script %{ $('#ExpenseReceptionDate').val('#{date}')}
+        page.execute_script %{ $('#ExpensePaymentDate').val('#{pay_until}')}
+        page.execute_script %{ $('.checkbox2').click() } if paid == true
       end
 
       def fill_autocomplete(field, options = {})
@@ -71,12 +82,16 @@ module Wfirma
         within '.ui-accordion-header' do
           page.execute_script %{ $('.ui-accordion-header input[type="text"]').first().click() }
           sleep 1
-          page.execute_script %{ $('span:contains("Inne wydatki")').first().click() }
+          page.execute_script %{ $('span:contains("#{expense_label}")').first().click() }
           sleep 1
         end
 
         page.execute_script %{ $('.input-brutto').first().val('#{amount_brutto}') }
         page.execute_script %{ $('.input-brutto').first().trigger('change') }
+      end
+
+      def expense_label
+        EXPENSES[expense_type]
       end
     end
   end
