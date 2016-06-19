@@ -1,5 +1,6 @@
 require 'capybara'
 require 'capybara/poltergeist'
+require 'capybara/dsl'
 
 module Wfirma
   module Expenses
