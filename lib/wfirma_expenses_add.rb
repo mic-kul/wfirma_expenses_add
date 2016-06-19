@@ -55,7 +55,7 @@ module Wfirma
           fill_amount amount_brutto
 
           sleep 1
-          click_button 'Zapisz i kontynuuj'
+          click_button 'Zapisz'
           sleep 1
         end
       end
